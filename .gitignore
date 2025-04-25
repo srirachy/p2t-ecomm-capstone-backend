@@ -1,0 +1,25 @@
+# Node modules
+node_modules
+
+# Build output
+build
+
+# Local environment variables
+.env
+
+# Log files
+*.log
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
