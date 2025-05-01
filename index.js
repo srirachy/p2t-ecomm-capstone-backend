@@ -7,7 +7,11 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+const corspolicy = {
+    'origin': process.env.FRONTEND_URI,
+} //allow origin
+
+app.use(cors(corspolicy));
 app.use(express.json());
 
 const connectDB = async () => {
