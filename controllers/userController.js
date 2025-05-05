@@ -15,7 +15,7 @@ export const authUser = async (req, res) => {
     res.status(401);
     throw new Error('Invalid email or password');
   }
-}
+};
 
 export const registerUser = async (req, res) => {
   const {email, password, name} = req.body;
@@ -26,9 +26,8 @@ export const registerUser = async (req, res) => {
       email: email,
       password: password,
       name: name,
-      isAdmin: false,
     });
 
     newUser.save();
   }
-}
+};
