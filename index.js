@@ -14,6 +14,16 @@ const checkJwt = auth({
     issuerBaseURL: process.env.AUTH0_BASE_URL,
     tokenSigningAlg: 'RS256'
 });
+const isAdmin = (req, res, next) => {
+    const perms = req.auth.payload.permissions || [];
+    // console.log(req);
+
+    // console.log(perms);
+    if(!perms.includes('manage:products')) {
+        return res.status(403).json({error: 'admin access required'});
+    }
+    next();
+}
 const corspolicy = {
     'origin': process.env.FRONTEND_URI,
 } //allow origin
@@ -37,7 +47,11 @@ app.get('/api/private-scoped', checkJwt, checkScopes, (_req, res) => {
     res.json('hello from private endpoint! you need auth and scope to read this!');
 });
 
-app.get('/authorized', function (req, res) {
+app.get('/api/manage-product', checkJwt, requiredScopes('manage:products'), isAdmin, (_req, res) => {
+    res.json('admin access granted! you have ability to manage product!');
+});
+
+app.get('/authorized', function (_req, res) {
     res.send('Secured Resource');
 });
 
