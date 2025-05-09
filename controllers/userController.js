@@ -1,37 +1,80 @@
 import User from '../schemas/User.js';
 
-// export const authUser = async (req, res) => {
-//   const {email, password} = req.body;
-//   const user = await User.findOne({ email });
+export const authUser = async (req, res) => {
+  const { idAuth0, lastActive } = req.body;
 
-//   if(user && (user.password === password)) {
-//     res.json({
-//       _id: user._id,
-//       name: user.name,
-//       email: user.email,
-//       isAdmin: user.isAdmin,
-//     });
-//   } else {
-//     res.status(401);
-//     throw new Error('Invalid email or password');
+  if(!idAuth0 || !lastActive) {
+    return res.status(400).json({ error: 'idAuth0 and lastActive are required'});
+  }
+
+  console.log(idAuth0);
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+        {idAuth0},
+        {$set: {lastActive: new Date(lastActive)}},
+        {new : true},
+    );
+    console.log(updatedUser);
+
+    if(!updatedUser){
+        return res.status(404).json({ error: 'User not found'});
+    }
+
+    res.status(200).json({success: true});
+  } catch (error) {
+    console.error('Error updated lastActive:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+};
+
+export const registerUser = async (req, res) => {
+  const {idAuth0, email, name} = req.body;
+
+  if (!idAuth0?.startsWith('auth0|') || !email) {
+    return res.status(400).json({ error: 'Invalid Auth0 ID or email' });
+  }
+
+  const user = await User.findOneAndUpdate(
+    { idAuth0 },
+    {
+        $setOnInsert: {
+            idAuth0,
+            email,
+            name: name || email.split('@')[0],
+            profilePic: "",
+            shippingAddresses: [],
+            phoneNum: null,
+            paymentMethods: [],
+        },
+        $set: { lastActive: new Date() },
+    },
+    { upsert: true, new: true},
+  );
+
+  res.status(201).json({
+    success: true,
+    email: user.email,
+    id: user._id,
+  });
+//   const existingUser = await User.findOne({ idAuth0 });
+//   if(existingUser) {
+//     res.status(409);
+//     throw new Error(`User ${email} already exists. Please sign in!`);
 //   }
-// };
-
-// export const registerUser = async (req, res) => {
-//   const {email, password, name} = req.body;
-//   const user = await User.findOne({ email });
+ 
+//   const newUser = await User.create({
+//     idAuth0,
+//     email,
+//     name: name || email.split('@')[0],
+//     shippingAddresses: shippingAddresses || [],
+//     phoneNum: phoneNum || "",
+//     paymentMethods: [],
+//     lastActive,
+//   })
   
-//   if(!user) {
-//     const newUser = new User({
-//       email: email,
-//       password: password,
-//       name: name,
-//     });
-
-//     newUser.save();
-//     res.send(email + ' is registed!');
-//   } else {
-//     res.status(401);
-//     throw new Error(email + ' already exists. Please sign in!');
-//   }
-// };
+//   res.status(201).json({
+//     success: true,
+//     email: newUser.email,
+//     name: newUser.name,
+//   })
+};

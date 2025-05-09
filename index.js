@@ -1,29 +1,20 @@
+import 'dotenv/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
-import { auth, requiredScopes } from 'express-oauth2-jwt-bearer'
-// import userRoutes from './routes/userRoutes.js'
-
-dotenv.config();
+import { 
+    auth, 
+    // requiredScopes, 
+} from 'express-oauth2-jwt-bearer'
+import { 
+    validateAuth0ApiKey,
+    // checkJwt,
+    // isAdmin,
+} from './middleware/auth.js';
+import userRoutes from './routes/userRoutes.js'
 
 const app = express();
 
-const checkJwt = auth({
-    audience: process.env.AUTH0_AUDIENCE,
-    issuerBaseURL: process.env.AUTH0_BASE_URL,
-    tokenSigningAlg: 'RS256'
-});
-const isAdmin = (req, res, next) => {
-    const perms = req.auth.payload.permissions || [];
-    // console.log(req);
-
-    // console.log(perms);
-    if(!perms.includes('manage:products')) {
-        return res.status(403).json({error: 'admin access required'});
-    }
-    next();
-}
 const corspolicy = {
     'origin': process.env.FRONTEND_URI,
 } //allow origin
@@ -35,31 +26,16 @@ app.get('/', (_req, res) => {
     res.send('API is running');
 });
 
-app.get('/api/private', checkJwt, (_req, res) => {
-    res.json({
-        message: 'hello from private endpoint! you need to be authenticated to see this'
-    })
-});
+// const checkScopes = requiredScopes('read:products');
+// app.get('/api/manage-product', checkJwt, requiredScopes('manage:products'), isAdmin, (_req, res) => {
+//     res.json('admin access granted! you have ability to manage product!');
+// });
 
-const checkScopes = requiredScopes('read:products');
-
-app.get('/api/private-scoped', checkJwt, checkScopes, (_req, res) => {
-    res.json('hello from private endpoint! you need auth and scope to read this!');
-});
-
-app.get('/api/manage-product', checkJwt, requiredScopes('manage:products'), isAdmin, (_req, res) => {
-    res.json('admin access granted! you have ability to manage product!');
-});
-
-app.get('/authorized', function (_req, res) {
-    res.send('Secured Resource');
-});
-
-// app.use('/users', userRoutes);
-// app.use('/admin/users', userRoutes); // likely no need after redirect
+app.use('/users', validateAuth0ApiKey, userRoutes);
 
 const PORT = process.env.PORT || 5000;
 const DEPLOYED_URI = process.env.DEPLOYED_URI;
+
 app.listen(PORT, () => {
     connectDB();
     console.log(`Server running on ${DEPLOYED_URI ? DEPLOYED_URI : `http://localhost:${PORT}`}`);
