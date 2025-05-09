@@ -56,25 +56,4 @@ export const registerUser = async (req, res) => {
     email: user.email,
     id: user._id,
   });
-//   const existingUser = await User.findOne({ idAuth0 });
-//   if(existingUser) {
-//     res.status(409);
-//     throw new Error(`User ${email} already exists. Please sign in!`);
-//   }
- 
-//   const newUser = await User.create({
-//     idAuth0,
-//     email,
-//     name: name || email.split('@')[0],
-//     shippingAddresses: shippingAddresses || [],
-//     phoneNum: phoneNum || "",
-//     paymentMethods: [],
-//     lastActive,
-//   })
-  
-//   res.status(201).json({
-//     success: true,
-//     email: newUser.email,
-//     name: newUser.name,
-//   })
 };

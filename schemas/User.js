@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-    idAuth0: {type: String, required: true, unique: true}, //from auth0
+    idAuth0: {type: String, required: true, unique: true}, 
     email: {type: String, unique: true},
     name: String,
     profilePic: String,
@@ -15,8 +15,8 @@ const userSchema = new mongoose.Schema({
     }],
     phoneNum: String,
     paymentMethods: [{
-        provider: String,   // 'stripe', 'paypal'
-        tokenId: String,    // payment method ID from provider
+        provider: String,   // 'stripe'
+        tokenId: String,    // payment method ID from stripe
     }],
     lastActive: Date,
 },

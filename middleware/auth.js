@@ -23,9 +23,7 @@ export const checkJwt = auth({
 
 export const isAdmin = (req, res, next) => {
     const perms = req.auth.payload.permissions || [];
-    // console.log(req);
 
-    // console.log(perms);
     if(!perms.includes('manage:products')) {
         return res.status(403).json({error: 'admin access required'});
     }
