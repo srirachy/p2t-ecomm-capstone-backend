@@ -2,10 +2,10 @@ import Product, { PRODUCT_CATEGORIES } from '../schemas/Product.js';
 
 export const getProducts = async (req, res) => {
     try {
-        const { category } = req.query;
+        const { categories } = req.query;
         const filter = {};
 
-        if (category) filter.category = category;
+        if (categories) filter.categories = categories;
 
         const products = await Product.find(filter);
         res.status(200).json(products);

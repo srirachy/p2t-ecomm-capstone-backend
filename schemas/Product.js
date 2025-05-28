@@ -6,10 +6,15 @@ const productSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true },
     price: { type: Number, required: true, min: 0 },
-    category: {
-        type: String,
+    categories: {
+        type: [String],
         required: true,
-        enum: PRODUCT_CATEGORIES,
+        validate: {
+            validator: function(categories) {
+                return categories.length > 0 && categories.every(category => PRODUCT_CATEGORIES.includes(category));
+            },
+            message: props => `Invalid categories: ${props.value}`,
+        }
     },
     images: [{
         url: String,
