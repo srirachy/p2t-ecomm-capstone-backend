@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+export const PRODUCT_CATEGORIES = ['Single Card', 'Full Deck', `Collector's Item`];
+
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true },
@@ -7,7 +9,7 @@ const productSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['Single Card', 'Full Deck', `Collector's Item`]
+        enum: PRODUCT_CATEGORIES,
     },
     images: [{
         url: String,

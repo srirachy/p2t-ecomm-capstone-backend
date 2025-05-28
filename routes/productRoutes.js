@@ -4,6 +4,7 @@ import { requiredScopes } from 'express-oauth2-jwt-bearer';
 import { 
     getProducts, 
     getProduct, 
+    getCategory,
     createProduct, 
     updateProduct, 
     deleteProduct
@@ -14,6 +15,7 @@ const router = express.Router();
 // public routes
 router.get('/', getProducts);
 router.get('/:slug', getProduct);
+router.get('/data/category', getCategory);
 
 // admin routes
 const checkScopes = requiredScopes('manage:products')

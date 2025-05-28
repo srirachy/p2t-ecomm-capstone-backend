@@ -1,4 +1,4 @@
-import Product from '../schemas/Product.js';
+import Product, { PRODUCT_CATEGORIES } from '../schemas/Product.js';
 
 export const getProducts = async (req, res) => {
     try {
@@ -54,6 +54,14 @@ export const deleteProduct = async (req, res) => {
         if(!product) return res.status(404).json({ error: 'Product not found' });
         res.status(200).json({ message: 'Product deleted' });
     } catch (error) {
-        res.status.json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
+
+export const getCategory = async (_req, res) => {
+    try {
+        res.status(200).json(PRODUCT_CATEGORIES);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+}
