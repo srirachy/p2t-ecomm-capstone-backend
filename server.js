@@ -9,7 +9,7 @@ const app = express();
 
 const corspolicy = {
     'origin': process.env.FRONTEND_URI,
-}
+};
 
 app.use(cors(corspolicy));
 app.use(express.json());
