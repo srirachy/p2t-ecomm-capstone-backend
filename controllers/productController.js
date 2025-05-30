@@ -39,7 +39,7 @@ export const createProduct = async (req, res) => {
         const uploadPromises = req.files.map(file => {
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
-                    { folder: 'products' },
+                    { folder: 'capstone' },
                     (error, result) => {
                         if (error) reject (error);
                         else resolve({
@@ -66,13 +66,6 @@ export const createProduct = async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-    // try {
-    //     const product = new Product(req.body);
-    //     await product.save();
-    //     res.status(401).json(product);
-    // } catch (error) {
-    //     res.status(400).json({ error: error.message });
-    // }
 };
 
 export const updateProduct = async (req, res) => {
