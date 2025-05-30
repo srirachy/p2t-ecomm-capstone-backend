@@ -57,3 +57,19 @@ export const registerUser = async (req, res) => {
     id: user._id,
   });
 };
+
+export const checkUser = async (req, res) => {
+  try {
+    const perms = req.auth?.payload?.permissions || [];
+    const isAdmin = perms.includes('manage:products');
+
+    res.status(200).json({
+      isAdmin,
+      userId: req.auth.payload.sub,
+      email: req.auth.payload.email,
+    });
+  } catch (error) {
+    console.error('Error in /me endpoint:', error);
+    res.status(500).json({ error: 'Internal server errror' });
+  }
+}
