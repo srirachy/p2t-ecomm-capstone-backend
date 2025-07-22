@@ -146,5 +146,38 @@ export const clearCart = async (req, res) => {
 };
 
 export const mergeCarts = async (userId, guestId) => {
-    
+    try {
+        const guestCart = await Cart.findOne({ guestId }).populate('items.product');
+        const userCart = await Cart.findOne({ user: userId }).populate('items.product');
+
+        if (guestCart && guestCart.items.length > 0) {
+            if(userCart) {
+                for (const guestItem of guestCart.items) {
+                    const existingItem = userCart.items.find(
+                        item => item.product_id.toString() === guestItem.product._id.toString()
+                    );
+
+                    if(existingItem) {
+                        existingItem.quantity += guestItem.quantity;
+                    } else {
+                        userCart.items.push(guestItem);
+                    }
+                }
+
+                await userCart.save();
+                await Cart.deleteOne({ guestId });
+                return userCart;
+            } else {
+                guestCart.user = userId;
+                guestCart.guestId = undefined;
+                await guestCart.save();
+                return guestCart;
+            }
+        }
+
+        return userCart || guestCart;
+    } catch (err) {
+        console.error('Error merging carts:', err);
+        throw err;
+    }
 }
