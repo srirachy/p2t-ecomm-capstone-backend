@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoutes.js'
 
 const app = express();
 

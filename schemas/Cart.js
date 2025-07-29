@@ -7,12 +7,11 @@ const cartItemSchema = new mongoose.Schema({
 
 const cartSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-    guestId: { type: String, required: false },
     items: [cartItemSchema],
     createdAt: { type: Date, default: Date.now, expires: '30d' },
 });
 
-cartSchema.index({ user: 1 }, { unique: true, partialFilterExpression: { user: { $exists: true }}});
-cartSchema.index({ guestId: 1 }, { unique: true, partialFilterExpression: { guestId: { $exists: true }}});
 
-module.exports = mongoose.model('Cart', cartSchema);
+const Cart = mongoose.model('Cart', cartSchema);
+
+export default Cart;
