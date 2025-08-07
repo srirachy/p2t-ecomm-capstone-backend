@@ -28,7 +28,7 @@ export const createCheckoutSession = async (req, res) => {
                 mode: 'payment',
                 success_url: `${process.env.FRONTEND_URI}/success?session_id={CHECKOUT_SESSION_ID}&user_id=${userId}`,
                 cancel_url: `${process.env.FRONTEND_URI}/cancel`,
-                metadata: {},
+                // metadata: {}, consider adding data here if needed for order feature
             });
 
             res.json({ id: session.id });
