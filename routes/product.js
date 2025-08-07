@@ -9,7 +9,7 @@ import {
     createProduct, 
     updateProduct, 
     deleteProduct
-} from '../controllers/productController.js';
+} from '../controllers/product.js';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
