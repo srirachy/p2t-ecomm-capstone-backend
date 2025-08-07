@@ -3,7 +3,7 @@ import {
   authUser,
   registerUser,
   checkUser
-} from '../controllers/userController.js';
+} from '../controllers/user.js';
 import {
   validateAuth0ApiKey,
   checkJwt

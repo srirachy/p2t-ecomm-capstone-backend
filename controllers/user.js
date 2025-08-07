@@ -7,7 +7,6 @@ export const authUser = async (req, res) => {
     return res.status(400).json({ error: 'idAuth0 and lastActive are required'});
   }
 
-  console.log(idAuth0);
   try {
     const updatedUser = await User.findOneAndUpdate(
         {idAuth0},

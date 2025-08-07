@@ -18,10 +18,12 @@
     "express": "^5.1.0",
     "express-oauth2-jwt-bearer": "^1.6.1",
     "mongoose": "^8.14.0",
-    "multer": "^2.0.0"
+    "multer": "^2.0.2",
+    "stripe": "^18.3.0"
   },
   "type": "module",
   "devDependencies": {
+    "brace-expansion": "^4.0.1",
     "nodemon": "^3.1.10"
   }
 }

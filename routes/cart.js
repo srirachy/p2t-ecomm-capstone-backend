@@ -5,13 +5,13 @@ import {
     addCartProduct,
     updateCartProduct,
     clearCart,
-} from '../controllers/cartController.js';
+} from '../controllers/cart.js';
 
 const router = express.Router();
 
 router.get('/', checkJwt, getCart);
 router.post('/add', checkJwt, addCartProduct);
 router.put('/update', checkJwt, updateCartProduct);
-router.put('/clear', checkJwt, clearCart);
+router.delete('/clear/:userid', clearCart);
 
 export default router;
