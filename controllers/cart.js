@@ -1,6 +1,6 @@
-import { getUserIdSanitized } from '../utils/index.js';
 import Cart from '../schemas/Cart.js';
 import Product from '../schemas/Product.js';
+import { getUserIdSanitized } from '../utils/index.js';
 
 const getOrCreateCart = async (userId) => {
     if (userId) {
