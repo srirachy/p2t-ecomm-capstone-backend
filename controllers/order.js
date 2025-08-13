@@ -8,11 +8,11 @@ export const createOrder = async (req, res) => {
     try {
         const sessionId = req.params.sessionid;
         const userId = req.params.userid;
-        
         const existingOrder = await Order.findOne({ stripeSessionId: sessionId });
+        
         if (existingOrder) {
             return res.status(409).json({ message: 'Order already exists' });
-        } // prevent duplicate order creation
+        }
 
         const session = await stripe.checkout.sessions.retrieve(
             sessionId,
@@ -40,7 +40,6 @@ export const createOrder = async (req, res) => {
                 orderItems: items.map(item => ({
                     name: item.description,
                     price: item.price.unit_amount / 100,
-                    // product: item.price.product.metadata.productId,
                     quantity: item.quantity,
                 })),
                 shippingAddress: {
