@@ -16,6 +16,9 @@ export const createCheckoutSession = async (req, res) => {
                     currency: 'usd',
                     product_data: {
                         name: item.product.name,
+                        // metadata: {
+                        //     productId: item.product._id.toString(),
+                        // }
                     },
                     unit_amount: item.product.price * 100,
                 },
@@ -37,6 +40,7 @@ export const createCheckoutSession = async (req, res) => {
                 // },
             });
 
+            // console.log(lineItems[0].price_data.product_data.metadata);
             res.json({ id: session.id });
         }
 

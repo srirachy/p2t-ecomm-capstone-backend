@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 const orderItemSchema = new mongoose.Schema({
     name: { type: String, required: true },
     price: { type: Number, required: true },
-    product: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'Product',
-    },
+    quantity: { type: Number, required: true },
+    // product: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     required: true,
+    //     ref: 'Product',
+    // },
 }, { _id: false });
 
 const shippingAddressSchema = new mongoose.Schema({
@@ -17,12 +18,12 @@ const shippingAddressSchema = new mongoose.Schema({
     country: { type: String, required: true },
 }, { _id: false });
 
-const paymentResultSchema = new mongoose.Schema({
-    id: { type: String },
-    status: { type: String },
-    update_time: { type:String },
-    email_address: { type: String },
-}, { _id: false });
+// const paymentResultSchema = new mongoose.Schema({
+//     id: { type: String },
+//     status: { type: String },
+//     update_time: { type:String },
+//     email_address: { type: String },
+// }, { _id: false });
 
 const orderSchema = new mongoose.Schema({
     user: {
@@ -35,10 +36,10 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['stripe'],
-        default: 'stripe',
+        enum: ['card', 'stripe'],
+        default: 'card',
     },
-    paymentResult: paymentResultSchema,
+    // paymentResult: paymentResultSchema,
     itemsPrice: {
         type: Number,
         required: true,
@@ -83,7 +84,7 @@ const orderSchema = new mongoose.Schema({
     },
 }, {
     timestamps: true,
-    toJson: { virtuals: true },
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
 });
 
@@ -92,7 +93,7 @@ orderSchema.index({ isPaid: 1 });
 orderSchema.index({ isDelivered: 1 });
 orderSchema.index({ createdAt: -1 });
 
-orderSchema.virtual('orderNumber').get(() => {
+orderSchema.virtual('orderNumber').get(function(){
     return `ORDER-${this._id.toString().substring(18, 24).toUpperCase()}`;
 });
 
