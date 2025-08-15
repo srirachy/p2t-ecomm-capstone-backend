@@ -77,6 +77,7 @@ export const getUserOrders = async (req, res) => {
     const userId = getUserIdSanitized(req.auth?.payload?.sub);
 
     const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+
     res.json(orders);
 };
 

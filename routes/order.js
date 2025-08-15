@@ -12,8 +12,8 @@ import {
 const router = express.Router();
 // public routes
 router.post('/:sessionid/:userid', createOrder);
-router.get('/:id', checkJwt, getOrderById);
 router.get('/myorders', checkJwt, getUserOrders);
+router.get('myorders/:id', checkJwt, getOrderById);
 
 // admin routes
 const checkScopes = requiredScopes('manage:orders');
