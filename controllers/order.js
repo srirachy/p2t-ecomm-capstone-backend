@@ -1,4 +1,5 @@
 import Order from '../schemas/Order.js';
+import Product from '../schemas/Product.js';
 import Stripe from 'stripe';
 import { getUserIdSanitized } from '../utils/index.js';
 
@@ -6,10 +7,9 @@ const stripe = Stripe(process.env.STRIPE_SK);
 
 export const createOrder = async (req, res) => {
     try {
-        const sessionId = req.params.sessionid;
-        const userId = req.params.userid;
+        const { id: sessionId } = req.params;
+        const userId = getUserIdSanitized(req.auth?.payload?.sub);
         const existingOrder = await Order.findOne({ stripeSessionId: sessionId });
-        
         if (existingOrder) {
             return res.status(409).json({ message: 'Order already exists' });
         }
@@ -17,10 +17,19 @@ export const createOrder = async (req, res) => {
         const session = await stripe.checkout.sessions.retrieve(
             sessionId,
         );
-
+        
         const line_items = await stripe.checkout.sessions.listLineItems(
             sessionId
         );
+
+        const productNames = line_items.data.map((item) => item.description);
+        const products = await Product.find({
+            name: { $in: productNames }
+        }).lean();
+        const productMap = products.reduce((map, product) => {
+            map[product.name.toLowerCase()] = product;
+            return map;
+        }, {});
 
         if (session && line_items) {
             const items = line_items.data;
@@ -37,11 +46,17 @@ export const createOrder = async (req, res) => {
 
             const order = new Order({
                 user: userId,
-                orderItems: items.map(item => ({
-                    name: item.description,
-                    price: item.price.unit_amount / 100,
-                    quantity: item.quantity,
-                })),
+                orderItems: items.map(item => {
+                    const normalizedItemName = item.description.toLowerCase();
+                    const dbProduct = productMap[normalizedItemName];
+                    
+                    return {
+                        name: item.description,
+                        price: item.price.unit_amount / 100,
+                        quantity: item.quantity,
+                        product: dbProduct?._id || null,
+                    }
+                }),
                 shippingAddress: {
                     address: address.line2 === null ? `${address.line1}` : `${address.line1} ${address.line2}`,
                     city: address.city,
@@ -60,7 +75,7 @@ export const createOrder = async (req, res) => {
                 stripePaymentIntentId,
                 stripeSessionId: sessionId,
             });
-
+            
             const newOrder = await order.save(); 
             res.json(newOrder);
         } else {
@@ -83,15 +98,14 @@ export const getUserOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
     const { 
-        // orderId,
         orderNum, 
         isAdmin 
     } = req.body
-    // const order = await Order.findById(orderId).populate('user', 'name email');
+
     const order = await Order.find({ orderNumber: orderNum }).populate('user', 'name email');
 
     if (order) {
-        if(order.user._id.toString === orderId.toString() || isAdmin) {
+        if(order.orderNum.toString() === orderNum.toString() || isAdmin) {
             res.json(order);
         } else {
             res.status(401).json('Not authorized to view this order');

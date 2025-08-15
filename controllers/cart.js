@@ -104,7 +104,7 @@ export const updateCartProduct = async (req, res) => {
 
 export const clearCart = async (req, res) => {
     try {
-        const userId = req.params.userid;
+        const userId = getUserIdSanitized(req.auth?.payload?.sub);
 
         const cart = await getOrCreateCart(userId);
         if (!cart) return res.status(404).json({ message: 'Cart not found' });
