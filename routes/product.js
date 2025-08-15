@@ -20,7 +20,7 @@ router.get('/:slug', getProduct);
 router.get('/data/category', getCategory);
 
 // admin routes
-const checkScopes = requiredScopes('manage:products')
+const checkScopes = requiredScopes('manage:products');
 router.post('/', checkJwt, checkScopes, upload.array('images'), isAdmin, createProduct);
 router.put('/:id', checkJwt, checkScopes, isAdmin, updateProduct);
 router.delete('/:id', checkJwt, checkScopes, isAdmin, deleteProduct);
