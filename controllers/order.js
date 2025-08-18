@@ -122,20 +122,49 @@ export const getAllOrders = async (_req, res) => {
 
 export const updateOrderDeliver = async (req, res) => {
     try {
-        const { sessionId } = req.body;
-        const order = await Order.findById(sessionId);
+        const { updatedOrders } = req.body;
 
-        if (order) {
-            order.isDeliver = true;
-            order.deliveredAt = Date.now();
+        if (!Array.isArray(updatedOrders)) 
+            return res.status(400).json({ message: 'updatedOrders must be an array' });
+    
+        const updateResults = await Promise.all(
+            updatedOrders.map(async ({ id, isDeliver }) => {
+                try {
+                const order = await Order.findById(id);
+                if (!order) {
+                    return { id, status: 'failed', message: 'Order not found' };
+                }
 
-            const updatedOrder = await order.save();
-            res.json(updatedOrder);
-        } else {
-            res.status(404).json('Order not found');
+                order.isDeliver = isDeliver;
+                order.deliveredAt = Date.now();
+                await order.save();
+                return { id, status: 'success' };
+                
+                } catch (error) {
+                return { id, status: 'failed', message: error.message };
+                }
+            })
+        );
+          
+        const failedUpdates = updateResults.filter(result => result.status === 'failed');
+            if (failedUpdates.length > 0) {
+            return res.status(207).json({
+                message: 'Some orders failed to update',
+                results: updateResults,
+                failedCount: failedUpdates.length,
+            });
         }
+
+        res.json({
+            message: 'All orders processed successfully',
+            results: updateResults,
+            successCount: updateResults.filter(r => r.status === 'success').length
+        });
     } catch (err) {
-        console.log(err)
-        res.status(500).json({ message: `Server error: ${err}`})
+        console.error('Error in updateOrderDeliver:', err);
+        res.status(500).json({ 
+            message: 'Server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
+        });
     }
 };
