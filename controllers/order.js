@@ -35,7 +35,7 @@ export const createOrder = async (req, res) => {
             const items = line_items.data;
             const address = session.collected_information.shipping_details.address;
             const paymentType = session.payment_method_types[0];
-            const itemsPrice = session.amount_subtotal;
+            const itemsPrice = session.amount_subtotal / 100;
             const taxPrice = session.total_details.amount_tax;
             const shippingPrice = session.total_details.amount_shipping;
             const isPaid = session.payment_status === 'paid' ? true : false;
