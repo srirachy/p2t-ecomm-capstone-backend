@@ -68,7 +68,7 @@ export const addCartProduct = async (req, res) => {
 export const updateCartProduct = async (req, res) => {
     try{
         const userId = getUserIdSanitized(req.auth?.payload?.sub);
-        const { productId, quantity } = req.body;
+        const { id: productId , quantity } = req.body;
 
         if (!productId) {
             return res.status(400).json({ message: 'Product ID is required' });
@@ -99,6 +99,47 @@ export const updateCartProduct = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: `Server error: ${err}`})
+    }
+};
+
+export const removeCartProduct = async (req, res) => {
+     try {
+        const { id } = req.params;
+        const userId = getUserIdSanitized(req.auth?.payload?.sub);
+
+        const userCart = await Cart.findOne({ user: userId });
+        if (!userCart) {
+            return res.status(404).json({ success: false, message: 'Cart not found' });
+        }
+
+        const initialItemCount = userCart.items.length;
+        userCart.items = userCart.items.filter(item => !item.product.equals(id));
+        
+        if (userCart.items.length === initialItemCount) {
+        return res.status(404).json({ success: false, message: 'Item not found in cart' });
+        }
+
+        userCart.total = userCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        userCart.updatedAt = new Date();
+
+        await userCart.save();
+
+        res.json({
+            success: true,
+            message: 'Item removed from cart successfully',
+            cart: {
+                total: userCart.total,
+                itemCount: userCart.items.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Remove item error:', error);
+        res.status(500).json({
+        success: false,
+        message: 'Server error removing item',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 

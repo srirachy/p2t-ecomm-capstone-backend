@@ -18,6 +18,6 @@ router.post('/create-order/:id', checkJwt, createOrder);
 // admin routes
 const checkScopes = requiredScopes('manage:orders');
 router.get('/', checkJwt, checkScopes, isAdmin, getAllOrders); // get all orders
-router.put('/:id/deliver', checkJwt, checkScopes, isAdmin, updateOrderDeliver); // update order to delivered
+router.put('/update-orders', checkJwt, checkScopes, isAdmin, updateOrderDeliver); // update order to delivered
 
 export default router;
